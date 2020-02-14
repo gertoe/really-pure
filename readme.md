@@ -2,6 +2,14 @@
 
 > Pretty, minimal and fast ZSH prompt
 
+
+# Pure++
+
+## (fork)
+> slightly modified pure theme extended by a useful right prompt
+
+
+
 <img src="screenshot.png" width="864">
 
 <br>
@@ -97,8 +105,8 @@ prompt pure
 | **`PURE_GIT_PULL=0`**            | Prevents Pure from checking whether the current Git remote has been updated.                   |                |
 | **`PURE_GIT_UNTRACKED_DIRTY=0`** | Do not include untracked files in dirtiness check. Mostly useful on large repos (like WebKit). |                |
 | **`PURE_GIT_DELAY_DIRTY_CHECK`** | Time in seconds to delay git dirty checking when `git status` takes > 5 seconds.               | `1800` seconds |
-| **`PURE_PROMPT_SYMBOL`**         | Defines the prompt symbol.                                                                     | `❯`            |
-| **`PURE_PROMPT_VICMD_SYMBOL`**   | Defines the prompt symbol used when the `vicmd` keymap is active (VI-mode).                    | `❮`            |
+| **`PURE_PROMPT_SYMBOL`**         | Defines the prompt symbol.                                                                     | `%`            |
+| **`PURE_PROMPT_VICMD_SYMBOL`**   | Defines the prompt symbol used when the `vicmd` keymap is active (VI-mode).                    | `[]`            |
 | **`PURE_GIT_DOWN_ARROW`**        | Defines the git down arrow symbol.                                                             | `⇣`            |
 | **`PURE_GIT_UP_ARROW`**          | Defines the git up arrow symbol.                                                               | `⇡`            |
 | **`PURE_GIT_STASH_SYMBOL`**      | Defines the git stash symbol.                                                                  | `≡`            |
@@ -134,20 +142,20 @@ Colors can be changed by using [`zstyle`](http://zsh.sourceforge.net/Doc/Release
 The following diagram shows where each color is applied on the prompt:
 
 ```
-┌───────────────────────────────────────────── path
-│          ┌────────────────────────────────── git:branch
-│          │      ┌─────────────────────────── git:action
-│          │      │       ┌─────────────────── git:dirty
-│          │      │       │ ┌───────────────── git:arrow
-│          │      │       │ │ ┌─────────────── git:stash
-│          │      │       │ │ │        ┌────── host
-│          │      │       │ │ │        │
-~/dev/pure master|rebase-i* ⇡ ≡ zaphod@heartofgold 42s
-venv ❯                        │                  │
-│    │                        │                  └───── execution_time
-│    │                        └──────────────────────── user
-│    └───────────────────────────────────────────────── prompt
-└────────────────────────────────────────────────────── virtualenv (or prompt:continuation)
+┌──────────────────────────────────────────────────── path
+│                 ┌────────────────────────────────── git:branch
+│                 │      ┌─────────────────────────── git:action
+│                 │      │       ┌─────────────────── git:dirty
+│                 │      │       │ ┌───────────────── git:arrow
+│                 │      │       │ │ ┌─────────────── git:stash
+│                 │      │       │ │ │        ┌────── host
+│                 │      │       │ │ │        │
+~/dev/really-pure master|rebase-i* ⇡ ≡ zaphod@heartofgold 42s                      ...        148 ⚙️ (1) | 42 | 04:42:42
+venv %                                 │                  │                                   │   │ │     │    └ issue time
+│    │                                 │                  └───── execution_time               │   │ │     └ command number
+│    │                                 └──────────────────────── user                         │   │ └ suspended jobs (only if)
+│    └───────────────────────────────────────────────── prompt                                │   └ return status (✔,✘,⚙️)
+└────────────────────────────────────────────────────── virtualenv (or prompt:continuation)   └ return code (only != 0)
 ```
 
 ### RGB colors

@@ -2,6 +2,8 @@
 # by Sindre Sorhus
 # https://github.com/sindresorhus/pure
 # MIT License
+# Pure++
+# modified Pure ("pure++") by Gerrit Toehgiono
 
 # For my own and others sanity
 # git:
@@ -186,10 +188,7 @@ prompt_pure_preprompt_render() {
 	local expanded_prompt
 	expanded_prompt="${(S%%)PROMPT}"
 
-	if [[ $1 == precmd ]]; then
-		# Initial newline, for spaciousness.
-		print
-	elif [[ $prompt_pure_last_prompt != $expanded_prompt ]]; then
+	if [[ $prompt_pure_last_prompt != $expanded_prompt ]]; then
 		# Redraw the prompt.
 		prompt_pure_reset_prompt
 	fi
@@ -590,12 +589,12 @@ prompt_pure_reset_prompt() {
 }
 
 prompt_pure_reset_prompt_symbol() {
-	prompt_pure_state[prompt]=${PURE_PROMPT_SYMBOL:-❯}
+	prompt_pure_state[prompt]=${PURE_PROMPT_SYMBOL:-%}
 }
 
 prompt_pure_update_vim_prompt_widget() {
 	setopt localoptions noshwordsplit
-	prompt_pure_state[prompt]=${${KEYMAP/vicmd/${PURE_PROMPT_VICMD_SYMBOL:-❮}}/(main|viins)/${PURE_PROMPT_SYMBOL:-❯}}
+	prompt_pure_state[prompt]=${${KEYMAP/vicmd/${PURE_PROMPT_VICMD_SYMBOL:-[] }}/(main|viins)/${PURE_PROMPT_SYMBOL:-%}}
 
 	prompt_pure_reset_prompt
 }
@@ -657,7 +656,7 @@ prompt_pure_state_setup() {
 	prompt_pure_state[version]="1.11.0"
 	prompt_pure_state+=(
 		username "$username"
-		prompt	 "${PURE_PROMPT_SYMBOL:-❯}"
+		prompt	 "${PURE_PROMPT_SYMBOL:-%}"
 	)
 }
 
@@ -710,8 +709,9 @@ prompt_pure_system_report() {
 }
 
 prompt_pure_setup() {
-	# Prevent percentage showing up if output doesn't end with a newline.
-	export PROMPT_EOL_MARK=''
+	# 'Enforce' default EOL behaviour:
+	#    print EOL_MARK '%' if output does not end with '\n'
+  export PROMPT_EOL_MARK='%B%S%#%s%b'
 
 	prompt_opts=(subst percent)
 
@@ -750,8 +750,11 @@ prompt_pure_setup() {
 		host                 242
 		path                 blue
 		prompt:error         red
-		prompt:success       magenta
+		prompt:success       default
 		prompt:continuation  242
+		rprompt:success      green
+		rprompt:error        red
+		rprompt:background   yellow
 		user                 242
 		user:root            default
 		virtualenv           242
@@ -775,11 +778,21 @@ prompt_pure_setup() {
 	PROMPT='%(12V.%F{$prompt_pure_colors[virtualenv]}%12v%f .)'
 
 	# Prompt turns red if the previous command didn't exit with 0.
-	local prompt_indicator='%(?.%F{$prompt_pure_colors[prompt:success]}.%F{$prompt_pure_colors[prompt:error]})${prompt_pure_state[prompt]}%f '
+	local prompt_indicator='%(?.%F{$prompt_pure_colors[prompt:success]}.%F{$prompt_pure_colors[prompt:error]})${prompt_pure_state[prompt]} %#%f '
 	PROMPT+=$prompt_indicator
 
 	# Indicate continuation prompt by … and use a darker color for it.
-	PROMPT2='%F{$prompt_pure_colors[prompt:continuation]}… %(1_.%_ .%_)%f'$prompt_indicator
+	PROMPT2='%F{$prompt_pure_colors[prompt:continuation]}…%(1_.%_ .%_)%f '
+
+  ## Right Prompt setup ##
+
+  # Indicate return status and wheter jobs are in background.
+  local rprompt_status='%(1j.%F{$prompt_pure_colors[rprompt:background]}%(?..%?) ⚙️ (%j).%(?.%F{$prompt_pure_colors[rprompt:success]}✔.%F{$prompt_pure_colors[prompt:error]}%? ✘))'
+
+	RPROMPT+=$rprompt_status
+
+  # Add command number and issue time
+	RPROMPT+='%f | %h | %*'
 
 	# Store prompt expansion symbols for in-place expansion via (%). For
 	# some reason it does not work without storing them in a variable first.
